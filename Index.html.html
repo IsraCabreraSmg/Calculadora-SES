@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>SES México - Price & Finance Calculator</title>
+  <style>
+    @font-face {
+      font-family: 'SamsungSSBody';
+      src: local('Samsung SS Body Regular'), local('SamsungSSBody-Regular');
+      font-weight: 400;
+      font-style: normal;
+    }
+
+    :root {
+      --samsung-blue: #0381fe;
+      --samsung-dark: #000000;
+      --samsung-navy: #0c2340;
+      --bg-gray: #f8f9fa;
+      --card-bg: #ffffff;
+      --text-main: #14171a;
+      --text-muted: #657786;
+      --border-color: #e1e8ed;
+      --success-green: #00875a;
+      --tag-bg: #e8f4fd;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'SamsungSSBody', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--bg-gray);
+      color: var(--text-main);
+      padding-bottom: 150px;
+    }
+
+    header {
+      background-color: #000;
+      color: #fff;
+      padding: 14px 18px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid var(--samsung-blue);
+    }
+
+    .brand-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+
+    .badge-ses {
+      background: var(--samsung-blue);
+      color: #fff;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 12px;
+      text-transform: uppercase;
+    }
+
+    /* Pestañas Principales */
+    .nav-tabs {
+      display: flex;
+      background: #ffffff;
+      border-bottom: 1px solid var(--border-color);
+      position: sticky;
+      top: 57px;
+      z-index: 99;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+    }
+
+    .nav-tab-btn {
+      flex: 1;
+      text-align: center;
+      padding: 14px 8px;
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .nav-tab-btn.active {
+      color: var(--samsung-blue);
+      border-bottom-color: var(--samsung-blue);
+      background-color: #fbfdff;
+    }
+
+    .container {
+      max-width: 650px;
+      margin: 0 auto;
+      padding: 16px;
+    }
+
+    .tab-view {
+      display: none;
+    }
+
+    .tab-view.active {
+      display: block;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 14px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      border: 1px solid var(--border-color);
+    }
+
+    .section-title {
+      font-size: 0.84rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .input-group {
+      margin-bottom: 12px;
+    }
+
+    .input-group:last-child {
+      margin-bottom: 0;
+    }
+
+    label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-main);
+      margin-bottom: 6px;
+    }
+
+    select, input[type="number"], input[type="text"] {
+      width: 100%;
+      padding: 12px 14px;
+      font-size: 0.95rem;
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      background-color: #fff;
+      color: var(--text-main);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    select:focus, input:focus {
+      border-color: var(--samsung-blue);
+    }
+
+    .toggle-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+
+    .toggle-btn {
+      padding: 10px 4px;
+      background: #f8f9fa;
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s;
+    }
+
+    .toggle-btn.active {
+      background: var(--samsung-blue);
+      border-color: var(--samsung-blue);
+      color: #fff;
+    }
+
+    .chips-grid {
+      display: flex;
+      gap: 6px;
+      margin-top: 6px;
+    }
+
+    .chip-item {
+      flex: 1;
+      padding: 8px 4px;
+      font-size: 0.78rem;
+      text-align: center;
+      border: 1px dashed var(--border-color);
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .chip-item.selected {
+      background: var(--tag-bg);
+      border-color: var(--samsung-blue);
+      color: var(--samsung-blue);
+    }
+
+    /* SC+ Box dentro de Cotización */
+    .sc-box {
+      background: #f0f6ff;
+      border: 1px solid #c8ddfd;
+      border-radius: 12px;
+      padding: 14px;
+    }
+
+    .sc-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .tier-badge {
+      font-size: 0.7rem;
+      font-weight: 700;
+      background: #0381fe;
+      color: #fff;
+      padding: 2px 7px;
+      border-radius: 8px;
+    }
+
+    /* Resumen de Cifras */
+    .breakdown-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.88rem;
+      margin-bottom: 9px;
+    }
+
+    .breakdown-row.discount {
+      color: var(--success-green);
+      font-weight: 600;
+    }
+
+    .breakdown-row.sc-cost {
+      color: var(--samsung-blue);
+      font-weight: 600;
+    }
+
+    .divider {
+      height: 1px;
+      background: var(--border-color);
+      margin: 8px 0;
+    }
+
+    /* Pestaña SC+ Detallada */
+    .sc-item-card {
+      background: #fafbfc;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 12px 14px;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* Pestaña Clips */
+    .clip-card {
+      background: #fff;
+      border-radius: 14px;
+      border: 1px solid var(--border-color);
+      padding: 16px;
+      margin-bottom: 14px;
+    }
+
+    .clip-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .clip-avatar {
+      width: 44px;
+      height: 44px;
+      background: #000;
+      color: #fff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 1rem;
+    }
+
+    .video-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-top: 10px;
+    }
+
+    .video-thumb {
+      background: #0c2340;
+      border-radius: 10px;
+      height: 160px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 12px;
+      color: #fff;
+      text-decoration: none;
+      transition: transform 0.2s;
+    }
+
+    .video-thumb:active {
+      transform: scale(0.98);
+    }
+
+    /* Barra Fija Inferior */
+    .bottom-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #ffffff;
+      border-top: 1px solid var(--border-color);
+      padding: 12px 18px;
+      box-shadow: 0 -4px 12px rgba(0,0,0,0.06);
+      z-index: 1000;
+    }
+
+    .bottom-bar-inner {
+      max-width: 650px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .total-amount {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: var(--samsung-dark);
+      letter-spacing: -0.5px;
+    }
+
+    .monthly-amount {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: var(--samsung-blue);
+    }
+
+    .disclaimer-box {
+      margin-top: 16px;
+      background: #fdf8e2;
+      border: 1px solid #fae8a4;
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 0.72rem;
+      line-height: 1.4;
+      color: #6a5700;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div>
+      <div class="brand-title">SAMSUNG SES</div>
+      <div style="font-size: 0.72rem; color: #a0aec0;">Affordability & Sales Dashboard · México</div>
+    </div>
+    <span class="badge-ses">SES ONLY · W37</span>
+  </header>
+
+  <!-- Pestañas Superiores -->
+  <div class="nav-tabs">
+    <div class="nav-tab-btn active" id="btnTab1" onclick="switchView('smartphone')">
+      <span>📱</span> Smartphone
+    </div>
+    <div class="nav-tab-btn" id="btnTab2" onclick="switchView('careplus')">
+      <span>🛡️</span> Samsung Care+
+    </div>
+    <div class="nav-tab-btn" id="btnTab3" onclick="switchView('clips')">
+      <span>🎬</span> Clips Video
+    </div>
+  </div>
+
+  <div class="container">
+
+    <!-- ================= PESTAÑA 1: SMARTPHONE ================= -->
+    <div id="viewSmartphone" class="tab-view active">
+      
+      <!-- 1. Selección de Producto -->
+      <div class="card">
+        <div class="section-title">
+          <span>1. Selección de Equipo</span>
+          <span id="catTag" style="font-size:0.75rem; color:var(--samsung-blue)">Smartphones</span>
+        </div>
+
+        <div class="input-group">
+          <label>Categoría</label>
+          <select id="selCategory" onchange="filterCategory()">
+            <option value="Smartphones">Smartphones (Galaxy Z & S & A)</option>
+            <option value="Tablets">Galaxy Tablets</option>
+            <option value="Wearables">Galaxy Watch & Buds</option>
+          </select>
+        </div>
+
+        <div class="input-group">
+          <label>Modelo y Capacidad</label>
+          <select id="selModel" onchange="onModelSelect()">
+            <!-- Dinámico -->
+          </select>
+        </div>
+      </div>
+
+      <!-- 2. Integración SC+ opcional en cotización -->
+      <div class="card">
+        <div class="section-title">
+          <span>2. Protección Adicional</span>
+          <span class="tier-badge" id="quoteTier">TIER --</span>
+        </div>
+
+        <div class="sc-box">
+          <div class="sc-header">
+            <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:0.88rem; font-weight:700;">
+              <input type="checkbox" id="chkSC" onchange="toggleSCQuote()" style="width:18px; height:18px; accent-color:var(--samsung-blue);">
+              <span>Incluir póliza Samsung Care+</span>
+            </label>
+          </div>
+
+          <div id="scQuoteOptions" style="display:none; margin-top:10px;">
+            <label style="font-size:0.78rem;">Plan SC+ para este modelo:</label>
+            <select id="selSCQuotePlan" onchange="calculate()">
+              <!-- Dinámico según Tier -->
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. Precio de Promoción Especial y Canje -->
+      <div class="card">
+        <div class="section-title">
+          <span>3. Precio de Promoción y Trade-in</span>
+        </div>
+
+        <!-- Casilla modificada -->
+        <div class="input-group">
+          <label for="inpCustomPromoPrice" style="color:var(--samsung-navy);">
+            Precio de Promoción del Promotor ($):
+          </label>
+          <input type="number" id="inpCustomPromoPrice" placeholder="Ingresa precio promo (o deja vacío para precio oficial)" min="0" step="50" oninput="calculate()">
+          <span style="font-size:0.72rem; color:var(--text-muted); display:block; margin-top:4px;">
+            * Si ingresas un precio aquí, las mensualidades, Trade-in y ahorros se calcularán sobre este valor base.
+          </span>
+        </div>
+
+        <div class="input-group" style="margin-top:14px;">
+          <label>Bono Trade-in (Canje)</label>
+          <div class="chips-grid">
+            <div class="chip-item selected" onclick="setTradeIn(0, this)">Sin Canje</div>
+            <div class="chip-item" onclick="setTradeIn(2000, this)">$2,000</div>
+            <div class="chip-item" onclick="setTradeIn(4000, this)">$4,000</div>
+            <div class="chip-item" onclick="setTradeIn(6000, this)">$6,000</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. Plan Financiero (MSI) -->
+      <div class="card">
+        <div class="section-title">
+          <span>4. Plazos Financieros (MSI)</span>
+          <span style="font-size:0.72rem; color:var(--text-muted)">Bancos Participantes</span>
+        </div>
+
+        <div class="toggle-grid">
+          <div class="toggle-btn" onclick="setMsi(1, this)">1 Pago</div>
+          <div class="toggle-btn" onclick="setMsi(6, this)">6 MSI</div>
+          <div class="toggle-btn" onclick="setMsi(12, this)">12 MSI</div>
+          <div class="toggle-btn active" onclick="setMsi(24, this)">24 MSI</div>
+        </div>
+      </div>
+
+      <!-- 5. Resumen -->
+      <div class="card">
+        <div class="section-title">
+          <span>Resumen de Cotización</span>
+        </div>
+        <div class="breakdown-row">
+          <span style="color:var(--text-muted)">Precio Regular Oficial:</span>
+          <span id="lblRegular">$0</span>
+        </div>
+        <div class="breakdown-row" id="rowPromoBase">
+          <span id="lblPromoBaseTag">Precio Promoción Base:</span>
+          <span id="lblPromoBaseVal" style="font-weight:700;">$0</span>
+        </div>
+        <div class="breakdown-row discount">
+          <span id="lblDiscountTag">Descuento de Campaña / Promotor:</span>
+          <span id="lblPromoDiscount">-$0</span>
+        </div>
+        <div class="breakdown-row discount" id="rowTradeIn" style="display:none;">
+          <span>Bono Canje Trade-in:</span>
+          <span id="lblTradeIn">-$0</span>
+        </div>
+        <div class="breakdown-row sc-cost" id="rowSC" style="display:none;">
+          <span id="lblSCTitle">Samsung Care+:</span>
+          <span id="lblSCPrice">+$0</span>
+        </div>
+        <div class="divider"></div>
+        <div class="breakdown-row" style="font-weight:700;">
+          <span>Ahorro Total para el Cliente:</span>
+          <span id="lblSavings" style="color:var(--success-green);">$0</span>
+        </div>
+      </div>
+
+      <!-- Disclaimer Legal -->
+      <div class="disclaimer-box">
+        <b>Aviso Legal:</b> Consulta interna para promotores SES. No representa una oferta vinculante ni contractual. Sujeto a disponibilidad física y aprobación bancaria en cajas. Precios con IVA.
+      </div>
+
+    </div>
+
+    <!-- ================= PESTAÑA 2: SAMSUNG CARE+ ================= -->
+    <div id="viewCarePlus" class="tab-view">
+      
+      <div class="card">
+        <div class="section-title">
+          <span>Catálogo Samsung Care+</span>
+          <span class="badge-ses" style="background:#2e69ff;">2026</span>
+        </div>
+
+        <div class="input-group">
+          <label>Consultar por Modelo:</label>
+          <select id="selSCModel" onchange="renderSCTab()">
+            <!-- Dinámico -->
+          </select>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; background:#f0f6ff; padding:12px; border-radius:10px; margin-top:8px;">
+          <div>
+            <div style="font-size:0.72rem; color:var(--text-muted); font-weight:700;">TIER ASIGNADO</div>
+            <div style="font-size:1.1rem; font-weight:800; color:var(--samsung-navy);" id="scTabTier">Tier 1</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-size:0.72rem; color:var(--text-muted); font-weight:700;">RANGO PRECIO EQUIPO</div>
+            <div style="font-size:0.85rem; font-weight:700; color:var(--samsung-blue);" id="scTabRange">$30,000 - $50,000</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="section-title">
+          <span>Planes de Pago Único / Financiables (Upfront)</span>
+        </div>
+        <div id="scUpfrontContainer"></div>
+      </div>
+
+      <div class="card">
+        <div class="section-title">
+          <span>Suscripción Mensual Recurrente (Monthly)</span>
+        </div>
+        <div id="scMonthlyContainer"></div>
+      </div>
+
+    </div>
+
+    <!-- ================= PESTAÑA 3: CLIPS ================= -->
+    <div id="viewClips" class="tab-view">
+      
+      <div class="clip-card">
+        <div class="clip-header">
+          <div class="clip-avatar">▶</div>
+          <div>
+            <div style="font-weight:700; font-size:0.95rem;">@training_mx</div>
+            <div style="font-size:0.75rem; color:var(--text-muted);">Canal Oficial de Entrenamiento Samsung México</div>
+          </div>
+        </div>
+        <p style="font-size:0.82rem; color:#444; line-height:1.4;">
+          Usa estos videos cortos demostrativos durante la interacción con el cliente para explicar beneficios clave, comparativas y argumentos de venta:
+        </p>
+
+        <div class="video-grid">
+          <a href="https://www.tiktok.com/@training_mx" target="_blank" class="video-thumb">
+            <span style="font-size:0.75rem; background:rgba(0,0,0,0.6); padding:2px 6px; border-radius:4px; align-self:flex-start;">Galaxy Z Series</span>
+            <span style="font-size:0.85rem; font-weight:700;">Durabilidad y Modo Flex en Piso de Venta ↗</span>
+          </a>
+          <a href="https://www.tiktok.com/@training_mx" target="_blank" class="video-thumb">
+            <span style="font-size:0.75rem; background:rgba(0,0,0,0.6); padding:2px 6px; border-radius:4px; align-self:flex-start;">Galaxy AI</span>
+            <span style="font-size:0.85rem; font-weight:700;">Demostración Live Translate & Circle to Search ↗</span>
+          </a>
+          <a href="https://www.tiktok.com/@training_mx" target="_blank" class="video-thumb">
+            <span style="font-size:0.75rem; background:rgba(0,0,0,0.6); padding:2px 6px; border-radius:4px; align-self:flex-start;">Samsung Care+</span>
+            <span style="font-size:0.85rem; font-weight:700;">Pitch de Venta: Cómo rebatir objeciones de costo ↗</span>
+          </a>
+          <a href="https://www.tiktok.com/@training_mx" target="_blank" class="video-thumb">
+            <span style="font-size:0.75rem; background:rgba(0,0,0,0.6); padding:2px 6px; border-radius:4px; align-self:flex-start;">Trade-in</span>
+            <span style="font-size:0.85rem; font-weight:700;">Guía rápida de canje en SES ↗</span>
+          </a>
+        </div>
+
+        <div style="margin-top:16px; text-align:center;">
+          <a href="https://www.tiktok.com/@training_mx?_r=1&_t=ZS-9ACLzWSTYrB" target="_blank" style="display:inline-block; padding:10px 18px; background:#000; color:#fff; border-radius:8px; font-size:0.85rem; font-weight:700; text-decoration:none;">
+            Abrir canal completo @training_mx en TikTok
+          </a>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- Barra Fija Inferior -->
+  <div class="bottom-bar" id="barBottom">
+    <div class="bottom-bar-inner">
+      <div>
+        <div style="font-size:0.72rem; color:var(--text-muted); text-transform:uppercase; font-weight:700;">Total a Pagar</div>
+        <div class="total-amount" id="barTotal">$0</div>
+      </div>
+      <div style="text-align:right;">
+        <div style="font-size:0.7rem; color:var(--samsung-blue); text-transform:uppercase; font-weight:700;" id="barMsiLabel">24 Mensualidades de</div>
+        <div class="monthly-amount" id="barMonthly">$0</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Catálogo extraído de Promo Execution W37
+    const CATALOG = [
+      {"category":"Smartphones","model":"Z Fold 8 Ultra 1TB","regular_price":58499,"promo_price":53499,"has_discount":true},
+      {"category":"Smartphones","model":"Z Fold 8 Ultra 512GB","regular_price":50999,"promo_price":45999,"has_discount":true},
+      {"category":"Smartphones","model":"Z Fold 8 512GB","regular_price":45999,"promo_price":43499,"has_discount":true},
+      {"category":"Smartphones","model":"Z Flip 8 512GB","regular_price":30499,"promo_price":27999,"has_discount":true},
+      {"category":"Smartphones","model":"Z Fold 7 512GB","regular_price":48999,"promo_price":34999,"has_discount":true},
+      {"category":"Smartphones","model":"Z Flip 7 512GB","regular_price":28499,"promo_price":17999,"has_discount":true},
+      {"category":"Smartphones","model":"S26 Ultra 1TB","regular_price":37999,"promo_price":37999,"has_discount":false},
+      {"category":"Smartphones","model":"S26 Ultra 512GB","regular_price":32999,"promo_price":32999,"has_discount":false},
+      {"category":"Smartphones","model":"S26+ 512GB","regular_price":28499,"promo_price":24999,"has_discount":true},
+      {"category":"Smartphones","model":"S26 256GB","regular_price":22499,"promo_price":17999,"has_discount":true},
+      {"category":"Smartphones","model":"S25 Ultra 1TB","regular_price":41999,"promo_price":41999,"has_discount":false},
+      {"category":"Smartphones","model":"S25 Ultra 512GB","regular_price":35999,"promo_price":35999,"has_discount":false},
+      {"category":"Smartphones","model":"S25 Ultra 256GB","regular_price":32999,"promo_price":32999,"has_discount":false},
+      {"category":"Smartphones","model":"S25+ 512GB","regular_price":28999,"promo_price":15999,"has_discount":true},
+      {"category":"Smartphones","model":"S25 256GB","regular_price":21499,"promo_price":13999,"has_discount":true},
+      {"category":"Smartphones","model":"S25 FE 128GB","regular_price":15499,"promo_price":11999,"has_discount":true},
+      {"category":"Smartphones","model":"A56 5G 256GB","regular_price":10999,"promo_price":7999,"has_discount":true},
+      {"category":"Smartphones","model":"A37 5G 128GB","regular_price":7999,"promo_price":5999,"has_discount":true},
+      {"category":"Smartphones","model":"A16 128GB","regular_price":4299,"promo_price":2699,"has_discount":true},
+      {"category":"Tablets","model":"Galaxy Tab S11 Ultra 512GB","regular_price":26999,"promo_price":26999,"has_discount":false},
+      {"category":"Tablets","model":"Galaxy Tab S10+ 256GB","regular_price":22999,"promo_price":18999,"has_discount":true},
+      {"category":"Tablets","model":"Galaxy Tab S10 FE 128GB","regular_price":9899,"promo_price":9899,"has_discount":false},
+      {"category":"Wearables","model":"Galaxy Watch Ultra 2 47mm","regular_price":11499,"promo_price":10999,"has_discount":true},
+      {"category":"Wearables","model":"Galaxy Watch 9 44mm","regular_price":7499,"promo_price":6299,"has_discount":true},
+      {"category":"Wearables","model":"Galaxy Buds3 Pro","regular_price":3999,"promo_price":2499,"has_discount":true}
+    ];
+
+    // Matriz SC+ 2026 oficial
+    const SC_TIERS = {
+      "0.1": { min: 30000, max: 60000, adh_1y: 4219, theft_1y: 6149, adh_ew_2y: 8649, monthly_adh_ew: 399, monthly_theft: 509 },
+      "0.2": { min: 19999, max: 29999, adh_1y: 4189, theft_1y: 5649, adh_ew_2y: 8279, monthly_adh_ew: 379, monthly_theft: 459 },
+      "0.3": { min: 30000, max: 36000, adh_1y: 4999, theft_1y: 5999, adh_ew_2y: 9999, monthly_adh_ew: 449, monthly_theft: 509 },
+      "0.4": { min: 60000, max: 70000, adh_1y: 5499, theft_1y: 7999, adh_ew_2y: 10999, monthly_adh_ew: 499, monthly_theft: 659 },
+      "1":   { min: 30000, max: 50000, adh_1y: 1489, theft_1y: 3219, adh_ew_2y: 3299, monthly_adh_ew: 149, monthly_theft: 249 },
+      "2":   { min: 20000, max: 29999, adh_1y: 1059, theft_1y: 2129, adh_ew_2y: 2219, monthly_adh_ew: 99, monthly_theft: 199 },
+      "3":   { min: 15000, max: 19999, adh_1y: 1019, theft_1y: 1729, adh_ew_2y: 1699, monthly_adh_ew: 79, monthly_theft: 139 },
+      "4":   { min: 8000,  max: 14999, adh_1y: 869,  theft_1y: 1259, adh_ew_2y: 1299, monthly_adh_ew: 69, monthly_theft: 109 },
+      "5":   { min: 4500,  max: 7999,  adh_1y: 669,  theft_1y: 969,  adh_ew_2y: 1159, monthly_adh_ew: 59, monthly_theft: 79 },
+      "6":   { min: 0,     max: 4499,  adh_1y: 529,  theft_1y: 909,  adh_ew_2y: 1129, monthly_adh_ew: 49, monthly_theft: 69 }
+    };
+
+    let selectedTradeIn = 0;
+    let selectedMsi = 24;
+
+    function formatMoney(n) {
+      return '$' + Math.round(n).toLocaleString('es-MX');
+    }
+
+    function switchView(tab) {
+      document.getElementById('btnTab1').classList.toggle('active', tab === 'smartphone');
+      document.getElementById('btnTab2').classList.toggle('active', tab === 'careplus');
+      document.getElementById('btnTab3').classList.toggle('active', tab === 'clips');
+
+      document.getElementById('viewSmartphone').classList.toggle('active', tab === 'smartphone');
+      document.getElementById('viewCarePlus').classList.toggle('active', tab === 'careplus');
+      document.getElementById('viewClips').classList.toggle('active', tab === 'clips');
+
+      document.getElementById('barBottom').style.display = (tab === 'smartphone') ? 'block' : 'none';
+      if (tab === 'careplus') renderSCTab();
+    }
+
+    function getTier(name, price) {
+      const lower = name.toLowerCase();
+      if (lower.includes('fold') || lower.includes('flip')) {
+        if (price > 60000) return '0.4';
+        if (lower.includes('fold')) return (price >= 36000) ? '0.1' : '0.3';
+        if (lower.includes('flip')) return (price >= 30000) ? '0.3' : '0.2';
+      }
+      if (price >= 30000) return '1';
+      if (price >= 20000) return '2';
+      if (price >= 15000) return '3';
+      if (price >= 8000) return '4';
+      if (price >= 4500) return '5';
+      return '6';
+    }
+
+    function filterCategory() {
+      const cat = document.getElementById('selCategory').value;
+      const selModel = document.getElementById('selModel');
+      selModel.innerHTML = '';
+
+      const items = CATALOG.filter(p => p.category === cat);
+      items.forEach(p => {
+        const opt = document.createElement('option');
+        opt.value = p.model;
+        opt.textContent = p.has_discount ? `${p.model} (${formatMoney(p.promo_price)})` : `${p.model} (${formatMoney(p.regular_price)})`;
+        selModel.appendChild(opt);
+      });
+      document.getElementById('catTag').textContent = cat;
+      onModelSelect();
+    }
+
+    function onModelSelect() {
+      const modelName = document.getElementById('selModel').value;
+      const product = CATALOG.find(p => p.model === modelName) || CATALOG[0];
+      const tier = getTier(product.model, product.regular_price);
+      document.getElementById('quoteTier').textContent = `TIER ${tier}`;
+
+      // Actualizar sugerencia en la casilla
+      const inpCustom = document.getElementById('inpCustomPromoPrice');
+      inpCustom.placeholder = `Por defecto: ${formatMoney(product.promo_price)}`;
+
+      const tData = SC_TIERS[tier] || SC_TIERS['1'];
+      const selSC = document.getElementById('selSCQuotePlan');
+      selSC.innerHTML = `
+        <option value='{"type":"upfront","p":${tData.adh_1y},"t":"1 Año ADH"}'>ADH 1 Año: ${formatMoney(tData.adh_1y)}</option>
+        <option value='{"type":"upfront","p":${tData.theft_1y},"t":"1 Año ADH+Robo"}'>ADH + Robo 1 Año: ${formatMoney(tData.theft_1y)}</option>
+        <option value='{"type":"upfront","p":${tData.adh_ew_2y},"t":"2 Años ADH+Garantía"}'>ADH + Garantía Ext. 2 Años: ${formatMoney(tData.adh_ew_2y)}</option>
+        <option value='{"type":"monthly","p":${tData.monthly_adh_ew},"t":"Suscripción ADH"}'>[Mensual] ADH: ${formatMoney(tData.monthly_adh_ew)}/mes</option>
+      `;
+      calculate();
+    }
+
+    function toggleSCQuote() {
+      const isChecked = document.getElementById('chkSC').checked;
+      document.getElementById('scQuoteOptions').style.display = isChecked ? 'block' : 'none';
+      calculate();
+    }
+
+    function setTradeIn(val, elem) {
+      selectedTradeIn = val;
+      document.querySelectorAll('.chip-item').forEach(c => c.classList.remove('selected'));
+      elem.classList.add('selected');
+      calculate();
+    }
+
+    function setMsi(msi, elem) {
+      selectedMsi = msi;
+      document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+      elem.classList.add('active');
+      calculate();
+    }
+
+    function calculate() {
+      const modelName = document.getElementById('selModel').value;
+      const product = CATALOG.find(p => p.model === modelName) || CATALOG[0];
+
+      const reg = product.regular_price;
+
+      // Lectura del precio promocional ingresado manualmente
+      const customPriceInput = parseFloat(document.getElementById('inpCustomPromoPrice').value);
+      const isCustomPromo = (!isNaN(customPriceInput) && customPriceInput > 0);
+
+      // Si hay precio ingresado, se toma como base; si no, se toma el precio de campaña del archivo
+      const basePromo = isCustomPromo ? customPriceInput : product.promo_price;
+      const promoDiscount = reg - basePromo;
+
+      // SC+ Addon
+      let scPrice = 0;
+      let isMonthly = false;
+      const isSC = document.getElementById('chkSC').checked;
+      const rowSC = document.getElementById('rowSC');
+
+      if (isSC && document.getElementById('selSCQuotePlan').value) {
+        const scPlan = JSON.parse(document.getElementById('selSCQuotePlan').value);
+        scPrice = scPlan.p;
+        rowSC.style.display = 'flex';
+        if (scPlan.type === 'upfront') {
+          document.getElementById('lblSCTitle').textContent = `SC+ (${scPlan.t}):`;
+          document.getElementById('lblSCPrice').textContent = `+${formatMoney(scPrice)}`;
+        } else {
+          isMonthly = true;
+          document.getElementById('lblSCTitle').textContent = `SC+ (${scPlan.t}):`;
+          document.getElementById('lblSCPrice').textContent = `+${formatMoney(scPrice)} / mes`;
+        }
+      } else {
+        rowSC.style.display = 'none';
+      }
+
+      // Resta de Trade-in sobre el precio base ingresado
+      let netHardware = basePromo - selectedTradeIn;
+      if (netHardware < 0) netHardware = 0;
+
+      let totalPay = netHardware + (!isMonthly ? scPrice : 0);
+      let monthly = selectedMsi > 0 ? (totalPay / selectedMsi) : totalPay;
+      if (isMonthly) monthly += scPrice;
+
+      // Actualización de desglose en pantalla
+      document.getElementById('lblRegular').textContent = formatMoney(reg);
+      
+      document.getElementById('lblPromoBaseTag').textContent = isCustomPromo ? 'Precio Promoción Ingresado:' : 'Precio Promoción Oficial:';
+      document.getElementById('lblPromoBaseVal').textContent = formatMoney(basePromo);
+      
+      document.getElementById('lblDiscountTag').textContent = isCustomPromo ? 'Descuento Especial Promotor:' : 'Descuento Campaña SES:';
+      document.getElementById('lblPromoDiscount').textContent = '-' + formatMoney(promoDiscount > 0 ? promoDiscount : 0);
+
+      const rTrade = document.getElementById('rowTradeIn');
+      if (selectedTradeIn > 0) {
+        rTrade.style.display = 'flex';
+        document.getElementById('lblTradeIn').textContent = '-' + formatMoney(selectedTradeIn);
+      } else {
+        rTrade.style.display = 'none';
+      }
+
+      document.getElementById('lblSavings').textContent = formatMoney(reg - netHardware);
+
+      // Barra inferior fija
+      document.getElementById('barTotal').textContent = formatMoney(totalPay);
+      document.getElementById('barMsiLabel').textContent = (selectedMsi === 1) ? 'Pago Único' : `${selectedMsi} Mensualidades de`;
+      document.getElementById('barMonthly').textContent = formatMoney(monthly);
+    }
+
+    function initSCTab() {
+      const sel = document.getElementById('selSCModel');
+      sel.innerHTML = '';
+      CATALOG.forEach(p => {
+        const opt = document.createElement('option');
+        opt.value = p.model;
+        opt.textContent = `${p.model} (${formatMoney(p.regular_price)})`;
+        sel.appendChild(opt);
+      });
+    }
+
+    function renderSCTab() {
+      const mName = document.getElementById('selSCModel').value;
+      const product = CATALOG.find(p => p.model === mName) || CATALOG[0];
+      const tier = getTier(product.model, product.regular_price);
+      const data = SC_TIERS[tier] || SC_TIERS['1'];
+
+      document.getElementById('scTabTier').textContent = `TIER ${tier}`;
+      document.getElementById('scTabRange').textContent = `${formatMoney(data.min)} - ${formatMoney(data.max)}`;
+
+      const upCont = document.getElementById('scUpfrontContainer');
+      upCont.innerHTML = `
+        <div class="sc-item-card">
+          <div>
+            <div style="font-weight:700; font-size:0.88rem;">Daño Accidental (ADH) · 1 Año</div>
+            <div style="font-size:0.72rem; color:#666;">Reparaciones de pantalla y golpes</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-weight:800; color:var(--samsung-blue); font-size:1.1rem;">${formatMoney(data.adh_1y)}</div>
+            <div style="font-size:0.68rem; color:#666;">o 24 MSI de ${formatMoney(data.adh_1y/24)}</div>
+          </div>
+        </div>
+        <div class="sc-item-card">
+          <div>
+            <div style="font-weight:700; font-size:0.88rem;">ADH + Robo con Violencia · 1 Año</div>
+            <div style="font-size:0.72rem; color:#666;">Protección contra robo y daño físico</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-weight:800; color:var(--samsung-blue); font-size:1.1rem;">${formatMoney(data.theft_1y)}</div>
+            <div style="font-size:0.68rem; color:#666;">o 24 MSI de ${formatMoney(data.theft_1y/24)}</div>
+          </div>
+        </div>
+        <div class="sc-item-card">
+          <div>
+            <div style="font-weight:700; font-size:0.88rem;">ADH + Garantía Extendida (EW) · 2 Años</div>
+            <div style="font-size:0.72rem; color:#666;">Cobertura completa multianual</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-weight:800; color:var(--samsung-blue); font-size:1.1rem;">${formatMoney(data.adh_ew_2y)}</div>
+            <div style="font-size:0.68rem; color:#666;">o 24 MSI de ${formatMoney(data.adh_ew_2y/24)}</div>
+          </div>
+        </div>
+      `;
+
+      const moCont = document.getElementById('scMonthlyContainer');
+      moCont.innerHTML = `
+        <div class="sc-item-card">
+          <div>
+            <div style="font-weight:700; font-size:0.88rem;">Suscripción ADH + EW</div>
+            <div style="font-size:0.72rem; color:#666;">Cargo mensual automático</div>
+          </div>
+          <div style="font-weight:800; color:var(--samsung-blue); font-size:1.1rem;">
+            ${formatMoney(data.monthly_adh_ew)} <span style="font-size:0.72rem;">/ mes</span>
+          </div>
+        </div>
+        <div class="sc-item-card">
+          <div>
+            <div style="font-weight:700; font-size:0.88rem;">Suscripción ADH + Robo + EW</div>
+            <div style="font-size:0.72rem; color:#666;">Máxima cobertura mensual</div>
+          </div>
+          <div style="font-weight:800; color:var(--samsung-blue); font-size:1.1rem;">
+            ${formatMoney(data.monthly_theft)} <span style="font-size:0.72rem;">/ mes</span>
+          </div>
+        </div>
+      `;
+    }
+
+    // Inicializar
+    filterCategory();
+    initSCTab();
+  </script>
+</body>
+</html>
